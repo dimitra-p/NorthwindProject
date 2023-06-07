@@ -1,0 +1,86 @@
+﻿@using Business_Logic_Layer.DTO;
+@using Radzen
+@inject NavigationManager navManager
+
+<p>
+    <RadzenTemplateForm TItem="CustomerDto" Data=@Customer>
+        <div style="display:flex; flex-direction: column;">
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Customer ID</RadzenText>
+                <RadzenTextBox MaxLength="5" Name="CustomerId" style="width: 100%;" @bind-Value="@Customer.CustomerId" />
+                <RadzenRequiredValidator Component="CustomerId" Text="Customer ID is required" Style="position:center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Company Name</RadzenText>
+                <RadzenTextBox style="width: 100%;" Name="CompanyName" @bind-Value="@Customer.CompanyName" />
+                <RadzenRequiredValidator Component="CompanyName" Text="Company Name is required" Style="position:center" />
+                <RadzenLengthValidator Component="CompanyName" Max="40" Text="Company Name should be max 40 characters" Style="position: center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Contact Name</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.ContactName" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Contact Title</RadzenText>
+                <RadzenTextBox Name="ContactTitle" style="width: 100%;" @bind-Value="@Customer.ContactTitle" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Address</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.Address" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">City</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.City" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Region</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.Region" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Postal Code</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.PostalCode" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Country</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.Country" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Phone</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.Phone" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Fax</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@Customer.Fax" />
+            </div><br>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <RadzenButton Text="Cancel" Click="Cancel" Icon="close" ButtonStyle="ButtonStyle.Light" style="margin-right:20px;" />
+            <RadzenButton Text="Save" Click=@SaveCustomer ButtonType="ButtonType.Submit" Icon="save" ButtonStyle="ButtonStyle.Success" style="margin-left:20px;" />
+        </div>
+    </RadzenTemplateForm>
+</p>
+
+
+
+@code {
+    [Parameter]
+    public CustomerDto Customer { get; set; }
+
+    [Parameter]
+    public EventCallback<CustomerDto> Save{ get; set; }
+
+    private void SaveCustomer()
+    {
+        Save.InvokeAsync(Customer);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private async Task Cancel()
+    {
+        navManager.NavigateTo("./Customer");
+    }
+}

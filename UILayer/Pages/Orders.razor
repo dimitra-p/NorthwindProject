@@ -1,0 +1,85 @@
+﻿@page "/Order"
+@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using UILayer.Components;
+@inject OrderService orderService
+@inject NavigationManager navManager
+@inject IModalService modal
+@inject DialogService DialogService
+
+<PageTitle>Orders</PageTitle>
+
+<RadzenText TextStyle="TextStyle.DisplayH3">Orders</RadzenText>
+<RadzenButton Click="@(()=>modal.Show<AddOrder>("Add Order"))" Text="Add" Style="margin-bottom: 20px;" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
+
+
+@if (@orderList.Count == 0)
+{
+    <br />
+    <b>Loading Orders...</b>
+}
+else
+{
+    <RadzenDataGrid Data="@orderList" TItem="OrderDto" PageSize="10" AllowSorting="true" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                ColumnWidth="150px" AllowColumnResize="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="OrderDto" Property="OrderId" Title="ID" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="CustomerId" Title="CUSTOMER ID" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="EmployeeId" Title="EMPLOYEE ID" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="OrderDate" Title="ORDER DATE" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="RequiredDate" Title="REQUIRED DATE" Width="200px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShippedDate" Title="SHIPPED DATE"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipVia" Title="SHIP VIA" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="Freight" Title="FREIGHT" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipName" Title="SHIP NAME" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipAddress" Title="SHIP ADDRESS" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipCity" Title="SHIP CITY" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipRegion" Title="SHIP REGION" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipPostalCode" Title="SHIP POSTAL CODE" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="ShipCountry" Title="SHIP COUNTRY" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="OrderId" Width="70px">
+                <Template Context="data">
+                    <RadzenButton Click="@(() => EditOrder(data.OrderId))" Icon="edit" ButtonStyle="ButtonStyle.Info" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="OrderDto" Property="OrderId" Width="70px">
+                <Template Context="data">
+                    <RadzenButton Click="@(() => ShowDeleteConfirmation(data.OrderId))" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+}
+
+
+@code {
+    public List<OrderDto> orderList = new List<OrderDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetOrders();
+        base.OnInitialized();
+    }
+
+    private async Task GetOrders()
+    {
+        orderList = await orderService.GetOrders();
+    }
+    
+    private void ShowDeleteConfirmation(int orderId)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("orderId", orderId);
+
+        DialogService.Open<DeleteOrder>("Delete Order", parameters);
+    }
+
+    private void EditOrder(int orderId)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("orderId", orderId);
+
+        DialogService.Open<UpdateOrder>("Edit Order", parameters);
+    }
+}

@@ -1,0 +1,98 @@
+﻿@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using Radzen;
+@inject ProductService productService
+@inject NavigationManager navManager
+@inject DialogService DialogService
+
+@code {
+    [Parameter]
+    public int productID{ get; set; }
+    public ProductDto updatedProduct { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        base.OnInitialized();
+        updatedProduct = await productService.GetProduct(productID);
+        ShowInlineDialog(productID);
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            await productService.EditProduct(updatedProduct);
+            navManager.NavigateTo("./Product", forceLoad: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task Cancel()
+    {
+        navManager.NavigateTo("./Product");
+    }
+
+    async Task ShowInlineDialog(int id)
+    {
+        var result = await DialogService.OpenAsync($"Edit Product with ID {id}", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <p>
+            <RadzenTemplateForm TItem="ProductDto" Data=@updatedProduct Submit="@(() => { Save(); })">
+                <div style="display:flex; flex-direction: column;">
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Product Name</RadzenText>
+                        <RadzenTextBox Name="ProductName" style="width: 100%;" @bind-Value="@updatedProduct.ProductName" />
+                        <RadzenRequiredValidator Component="ProductName" Text="Product Name is required" Style="position:center" />
+                        <RadzenLengthValidator Component="ProductName" Max="40" Text="Product Name should be max 40 characters" Style="position: center" />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Supplier Id</RadzenText>
+                        <RadzenNumeric Name="SupplierId" ShowUpDown="false" TValue="int?" style="width: 100%;" @bind-Value=@updatedProduct.SupplierId />
+                        <RadzenRequiredValidator Component="SupplierId" Text="Supplier ID is required" Style="position:center" />
+                        <RadzenNumericRangeValidator Component="SupplierId" Min="1" Max="29" Text="Supplier ID should be between 1 and 29" Style="position: center" />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Category Id</RadzenText>
+                        <RadzenNumeric Name="CategoryId" ShowUpDown="false" TValue="int?" style="width: 100%;" @bind-Value=@updatedProduct.CategoryId />
+                        <RadzenRequiredValidator Component="CategoryId" Text="Category ID is required" Style="position:center" />
+                        <RadzenNumericRangeValidator Component="CategoryId" Min="1" Max="8" Text="Category ID should be between 1 and 8" Style="position: center" />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Quantity PerUnit</RadzenText>
+                        <RadzenTextBox style="width: 100%;" @bind-Value="@updatedProduct.QuantityPerUnit" />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Unit Price</RadzenText>
+                        <RadzenNumeric ShowUpDown="false" TValue="decimal?" style="width: 100%;" @bind-Value=@updatedProduct.UnitPrice />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Units In Stock</RadzenText>
+                        <RadzenNumeric ShowUpDown="false" TValue="short?" style="width: 100%;" @bind-Value=@updatedProduct.UnitsInStock />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Units On Order</RadzenText>
+                        <RadzenNumeric ShowUpDown="false" TValue="short?" style="width: 100%;" @bind-Value=@updatedProduct.UnitsOnOrder />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Reorder Level</RadzenText>
+                        <RadzenNumeric ShowUpDown="false" TValue="short?" style="width: 100%;" @bind-Value=@updatedProduct.ReorderLevel />
+                    </div><br>
+                    <div style="display:flex;">
+                        <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Discontinued</RadzenText>
+                        <RadzenCheckBox @bind-Value=@updatedProduct.Discontinued Name="CheckBox1" />
+                    </div><br>
+                </div>
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <RadzenButton Text="Cancel" Click="Cancel" Icon="close" ButtonStyle="ButtonStyle.Light" style="margin-right:20px;" />
+                    <RadzenButton Text="Save" ButtonType="ButtonType.Submit" Icon="save" ButtonStyle="ButtonStyle.Success" style="margin-left:20px;" />
+                </div>
+            </RadzenTemplateForm>
+        </p>
+    </RadzenStack>
+    );
+        DialogService.Close();
+    }
+}

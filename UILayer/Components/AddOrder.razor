@@ -1,0 +1,104 @@
+﻿@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using Radzen;
+@inject OrderService orderService
+@inject NavigationManager navManager
+
+@*There are some more validators to add*@
+<p>
+    <RadzenTemplateForm TItem="OrderCreateDto" Data=@addedOrder Submit="@(() => { Save(); })">
+        <div style="display:flex; flex-direction: column;">
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Customer ID</RadzenText>
+                <RadzenTextBox Name="CustomerId" MaxLength="5" style="width: 100%;" @bind-Value="@addedOrder.CustomerId" />
+                <RadzenRequiredValidator Component="CustomerId" Text="Customer ID is required" Style="position:center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Employee ID</RadzenText>
+                <RadzenNumeric Name="EmployeeId" ShowUpDown="false" TValue="int?" style="width: 100%;" @bind-Value=@addedOrder.EmployeeId />
+                <RadzenRequiredValidator Component="EmployeeId" Text="Employee ID is required" Style="position:center" />
+                <RadzenNumericRangeValidator Component="EmployeeId" Min="1" Max="9" Text="Employee ID should be between 1 and 9" Style="position: center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Order Date</RadzenText>
+                <RadzenDatePicker style="width: 100%;" @bind-Value=@addedOrder.OrderDate />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Required Date</RadzenText>
+                <RadzenDatePicker style="width: 100%;" @bind-Value="@addedOrder.RequiredDate" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Shipped Date</RadzenText>
+                <RadzenDatePicker style="width: 100%;" @bind-Value=@addedOrder.ShippedDate />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship Via</RadzenText>
+                <RadzenNumeric Name="ShipVia" ShowUpDown="false" TValue="int?" style="width: 100%;" @bind-Value=@addedOrder.ShipVia />
+                <RadzenRequiredValidator Component="ShipVia" Text="Ship Via is required" Style="position:center" />
+                <RadzenNumericRangeValidator Component="ShipVia" Min="1" Max="3" Text="Ship Via should be between 1 and 3" Style="position: center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Freight</RadzenText>
+                <RadzenNumeric ShowUpDown="false" TValue="decimal?" style="width: 100%;" @bind-Value=@addedOrder.Freight />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship Name</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value=@addedOrder.ShipName />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship Address</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value=@addedOrder.ShipAddress />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship City</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value=@addedOrder.ShipCity />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship Region</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value=@addedOrder.ShipRegion />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship Postal Code</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value=@addedOrder.ShipPostalCode />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Ship Country</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value=@addedOrder.ShipCountry />
+            </div><br>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <RadzenButton Text="Cancel" Click="Cancel" Icon="close" ButtonStyle="ButtonStyle.Light" style="margin-right:20px;" />
+            <RadzenButton Text="Save"  ButtonType="ButtonType.Submit" Icon="save" ButtonStyle="ButtonStyle.Success" style="margin-left:20px;" />
+        </div>
+    </RadzenTemplateForm>
+</p>
+
+
+
+@code {
+    private OrderCreateDto addedOrder { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        addedOrder = new OrderCreateDto();
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            await orderService.AddOrder(addedOrder);
+            navManager.NavigateTo("./Order", forceLoad: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task Cancel()
+    {
+        navManager.NavigateTo("./Order");
+    }
+}

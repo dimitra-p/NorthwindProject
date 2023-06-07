@@ -1,0 +1,84 @@
+﻿@page "/Customer"
+@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using UILayer.Components;
+@using Microsoft.AspNetCore.Components.Web
+@inject CustomerService customerService
+@inject NavigationManager navManager
+@inject IModalService modal
+@inject DialogService DialogService
+
+<PageTitle>Customers</PageTitle>
+
+<RadzenText TextStyle="TextStyle.DisplayH3">Customers</RadzenText>
+<RadzenButton Click="@(()=>modal.Show<AddCustomer>("Add Customer"))" Text="Add" Style="margin-bottom: 20px;" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
+
+
+@if (@customerList.Count == 0)
+{
+    <br/>
+    <b>Loading Customers...</b>
+}
+else
+{
+        <RadzenDataGrid Data="@customerList" TItem="CustomerDto" PageSize="10" AllowSorting="true" AllowAlternatingRows="false" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                ColumnWidth="150px" AllowColumnResize="true" AllowFiltering="false">
+        <Columns>
+                <RadzenDataGridColumn TItem="CustomerDto" Property="CustomerId" Title="CUSTOMER ID" Frozen="true" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="CompanyName" Title="COMPANY NAME" ></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="ContactName" Title="CONTACT NAME" ></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="ContactTitle" Title="CONTACT TITLE" ></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="Address" Title="ADDRESS"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="City" Title="CITY" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="Region" Title="REGION" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="PostalCode" Title="POSTAL CODE" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="Country" Title="COUNTRY" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="Phone" Title="PHONE" ></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="Fax" Title="FAX"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="CustomerId" Width="70px">
+                <Template Context="data">
+                    <RadzenButton Click="@(() => EditCustomer(data.CustomerId))" Icon="edit" ButtonStyle="ButtonStyle.Info" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="CustomerDto" Property="CustomerId" Width="70px">
+                <Template Context="data">
+                    <RadzenButton Click="@(() => ShowDeleteConfirmation(data.CustomerId))" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+}
+
+
+@code {
+    public List<CustomerDto> customerList = new List<CustomerDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCustomers();
+        base.OnInitialized();
+    }
+
+    private async Task GetCustomers()
+    {
+        customerList = await customerService.GetCustomers();
+    }
+
+    private void ShowDeleteConfirmation(string customerId)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("customerID", customerId);
+
+        DialogService.Open<DeleteConfirmation>("Delete Customer", parameters);
+    }
+
+    private void EditCustomer(string customerId)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("customerID", customerId);
+
+        DialogService.Open<UpdateCustomer>("Edit Customer", parameters);
+    } 
+
+}

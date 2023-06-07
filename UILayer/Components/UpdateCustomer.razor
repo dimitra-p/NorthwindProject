@@ -1,0 +1,41 @@
+﻿@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@inject CustomerService customerService
+@inject NavigationManager navManager
+@inject DialogService DialogService
+
+@code {
+    [Parameter]
+    public string customerID { get; set; }
+    private CustomerDto updatedCustomer;
+
+    protected override async void OnInitialized()
+    {
+        base.OnInitialized();
+        updatedCustomer = await customerService.GetCustomer(customerID);
+        ShowInlineDialog(customerID);
+    }
+
+    private async Task Save(CustomerDto customer)
+    {
+        try
+        {
+            await customerService.EditCustomer(customer);
+            navManager.NavigateTo("./Customer", forceLoad: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    async Task ShowInlineDialog(string id)
+    {
+        var result = await DialogService.OpenAsync("Edit Customer", ds =>
+    @<RadzenStack Gap="1rem">
+        <AddEditCustomer Customer="updatedCustomer" Save="Save"></AddEditCustomer>
+    </RadzenStack>
+    );
+        DialogService.Close();
+    }
+}

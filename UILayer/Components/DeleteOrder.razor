@@ -1,0 +1,44 @@
+﻿@using UILayer.Services;
+@inject OrderService orderService
+@inject NavigationManager navManager
+@inject DialogService DialogService
+
+@code {
+    [Parameter]
+    public int orderID { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ShowInlineDialog(orderID);
+    }
+
+    async Task ShowInlineDialog(int id)
+    {
+        var result = await DialogService.OpenAsync("Delete Order", ds =>
+    @<RadzenStack Gap="1rem">
+        <p>Are you sure that you want to delete the Order with ID <b>@id</b>?</p>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Delete" Icon="delete" ButtonStyle="ButtonStyle.Danger" Click="Delete" />
+                <RadzenButton Text="Cancel" Icon="close" Click="Cancel" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    );
+        DialogService.Close();
+    }
+
+    private void Delete()
+    {
+        orderService.DeleteOrder(orderID);
+        navManager.NavigateTo("./Order", forceLoad: true);
+
+    }
+
+    private void Cancel()
+    {
+        DialogService.Close();
+        navManager.NavigateTo("./Order");
+    }
+}

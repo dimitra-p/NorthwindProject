@@ -1,0 +1,88 @@
+﻿@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using Radzen;
+@inject ProductService productService
+@inject NavigationManager navManager
+
+<p>
+    <RadzenTemplateForm TItem="ProductCreateDto" Data=@addedProduct Submit="@(() => { Save(); })">
+        <div style="display:flex; flex-direction: column;">
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">ProductName</RadzenText>
+                <RadzenTextBox Name="ProductName" style="width: 100%;" @bind-Value="@addedProduct.ProductName" />
+                <RadzenRequiredValidator Component="ProductName" Text="Product Name is required" Style="position:center" />
+                <RadzenLengthValidator Component="ProductName" Max="40" Text="Product Name should be max 40 characters" Style="position: center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Supplier Id</RadzenText>
+                <RadzenNumeric Name="SupplierId" ShowUpDown="false" TValue="int?" style="width: 100%;" @bind-Value=@addedProduct.SupplierId />
+                <RadzenRequiredValidator Component="SupplierId" Text="Supplier Id is required" Style="position:center" />
+                <RadzenNumericRangeValidator Component="SupplierId" Min="1" Max="29" Text="Supplier ID should be between 1 and 29" Style="position: center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">CategoryId</RadzenText>
+                <RadzenNumeric Name="CategoryId" ShowUpDown="false" TValue="int?" style="width: 100%;" @bind-Value=@addedProduct.CategoryId />
+                <RadzenRequiredValidator Component="CategoryId" Text="Category Id is required" Style="position:center" />
+                <RadzenNumericRangeValidator Component="CategoryId" Min="1" Max="8" Text="Category ID should be between 1 and 8" Style="position: center" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">QuantityPerUnit</RadzenText>
+                <RadzenTextBox style="width: 100%;" @bind-Value="@addedProduct.QuantityPerUnit" />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">UnitPrice</RadzenText>
+                <RadzenNumeric ShowUpDown="false" TValue="decimal?" style="width: 100%;" @bind-Value=@addedProduct.UnitPrice />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">UnitsInStock</RadzenText>
+                <RadzenNumeric ShowUpDown="false" TValue="short?" style="width: 100%;" @bind-Value=@addedProduct.UnitsInStock />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">UnitsOnOrder</RadzenText>
+                <RadzenNumeric ShowUpDown="false" TValue="short?" style="width: 100%;" @bind-Value=@addedProduct.UnitsOnOrder />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">ReorderLevel</RadzenText>
+                <RadzenNumeric ShowUpDown="false" TValue="short?" style="width: 100%;" @bind-Value=@addedProduct.ReorderLevel />
+            </div><br>
+            <div style="display:flex;">
+                <RadzenText TextStyle="TextStyle.Subtitle1" style="width: 24%;">Discontinued</RadzenText>
+                <RadzenCheckBox @bind-Value=@addedProduct.Discontinued Name="CheckBox1" />
+            </div><br>
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <RadzenButton Text="Cancel" Click="Cancel" Icon="close" ButtonStyle="ButtonStyle.Light" style="margin-right:20px;" />
+            <RadzenButton Text="Save" ButtonType="ButtonType.Submit" Icon="save" ButtonStyle="ButtonStyle.Success" style="margin-left:20px;" />
+        </div>
+    </RadzenTemplateForm>
+</p>
+
+
+
+@code {
+    private ProductCreateDto addedProduct { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        addedProduct = new ProductCreateDto();
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            await productService.AddProduct(addedProduct);
+            navManager.NavigateTo("./Product", forceLoad: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task Cancel()
+    {
+        navManager.NavigateTo("./Product");
+    }
+}

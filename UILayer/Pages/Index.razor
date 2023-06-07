@@ -1,0 +1,25 @@
+﻿@page "/"
+@using Business_Logic_Layer.DTO;
+@using Data_Access_Layer.Models;
+@using UILayer.Services;
+@using UILayer.Components;
+@inject ProductService prservice;
+@inject IModalService modal
+
+<PageTitle>Index</PageTitle>
+<RadzenText TextStyle="TextStyle.DisplayH3">Home</RadzenText>
+<br/>
+<p>
+    This is the homepage.
+    You can navigate your way around with the menu on the left.
+</p>
+
+
+
+@code{
+   
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+}

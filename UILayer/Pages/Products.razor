@@ -1,0 +1,84 @@
+﻿@page "/Product"
+@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using UILayer.Components;
+@using Microsoft.AspNetCore.Components.Web
+@inject ProductService productService
+@inject NavigationManager navManager
+@inject IModalService modal
+@inject DialogService DialogService
+
+<PageTitle>Products</PageTitle>
+
+<RadzenText TextStyle="TextStyle.DisplayH3">Products</RadzenText>
+<RadzenButton Click="@(()=>modal.Show<AddProduct>("Add Product"))" Text="Add" Icon="add_circle_outline" Style="margin-bottom: 20px;"  ButtonStyle="ButtonStyle.Secondary" />
+
+
+@if (@productList.Count == 0)
+{
+    <br />
+    <b>Loading Products...</b>
+}
+else
+{
+    <RadzenDataGrid Data="@productList" TItem="ProductDto" PageSize="10" AllowSorting="true" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                ColumnWidth="150px" AllowColumnResize="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="ProductDto" Property="ProductId" Title="ID" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="ProductName" Title="NAME" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="SupplierId" Title="SUPPLIER ID" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="CategoryId" Title="CATEGORY ID" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="QuantityPerUnit" Title="QUANTITY PER UNIT" Width="200px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="UnitPrice" Title="UNIT PRICE"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="UnitsInStock" Title="UNITS IN STOCK" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="UnitsOnOrder" Title="UNITS ON ORDER" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="ReorderLevel" Title="REORDER LEVEL" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="Discontinued" Title="DISCONTINUED" Width="100px"></RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="ProductId" Width="70px">
+                <Template Context="data">
+                    <RadzenButton Click="@(() => EditProduct(data.ProductId))" Icon="edit" ButtonStyle="ButtonStyle.Info" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ProductDto" Property="ProductId" Width="70px">
+                <Template Context="data">
+                    <RadzenButton Click="@(() => ShowDeleteConfirmation(data.ProductId))" Icon="delete" ButtonStyle="ButtonStyle.Danger" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+}
+
+
+@code {
+
+    public List<ProductDto> productList = new List<ProductDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetProducts();
+        base.OnInitialized();
+    }
+
+    private async Task GetProducts()
+    {
+        productList = await productService.GetProducts();
+    }
+
+    private void ShowDeleteConfirmation(int productID)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("productID", productID);
+
+        DialogService.Open<DeleteProduct>("Delete Product", parameters);
+    }
+
+    private void EditProduct(int productID)
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("productID", productID);
+
+        DialogService.Open<UpdateProduct>("Edit Product", parameters);
+    }
+
+}

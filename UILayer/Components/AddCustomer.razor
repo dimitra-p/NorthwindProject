@@ -1,0 +1,32 @@
+﻿@using Business_Logic_Layer.DTO;
+@using UILayer.Services;
+@using Radzen
+@inject CustomerService customerService
+@inject NavigationManager navManager
+
+<AddEditCustomer Customer="addedCustomer" Save="Save"></AddEditCustomer>
+
+@code {
+
+    private CustomerDto addedCustomer;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        addedCustomer = new CustomerDto();
+    }
+
+    private async Task Save(CustomerDto customer)
+    {
+        try
+        {
+            await customerService.AddCustomer(customer);
+            navManager.NavigateTo("./Customer", forceLoad: true);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+}
