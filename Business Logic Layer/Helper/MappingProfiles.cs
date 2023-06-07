@@ -6,6 +6,7 @@ namespace Business_Logic_Layer.Helper
 {
     public class MappingProfiles : Profile
     {
+	//Create DTOs' mappings
         public MappingProfiles()
         {
             CreateMap<Customer, CustomerDto>();
